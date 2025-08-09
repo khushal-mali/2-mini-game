@@ -63,7 +63,7 @@ const GameScreen = ({ userNumber, onGameOver, roundsNumber, setRoundsNumber }) =
     return (
       <View style={styles.logItem}>
         <Text style={styles.logText}>#{roundNumber}</Text>
-        <Text style={styles.logText}>💡 {itemData.item}</Text>
+        <Text style={styles.logText}>💡Opponent's Guess: {itemData.item}</Text>
       </View>
     );
   }
@@ -133,6 +133,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     elevation: 2,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
   },
   logText: {
     color: "white",
