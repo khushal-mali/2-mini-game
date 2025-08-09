@@ -1,34 +1,52 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, StyleSheet, Text, TextInput, View, Keyboard } from "react-native";
 import PrimaryButton from "../components/ui/PrimaryButton";
 import Colors from "../constants/colors";
 import Title from "../components/ui/Title";
+import Card from "../components/ui/Card";
+import InstructionText from "../components/ui/InstructionText";
+
+let minBoundary = 1;
+let maxBoundary = 100;
 
 const StartGameScreen = ({ onPickNumber }) => {
   const [enteredNumber, setEnteredNumber] = useState("");
 
-  const numberInputHandler = (val) => setEnteredNumber(() => val);
+  const numberInputHandler = (val) => {
+    // Remove any non-numeric characters
+    const cleanValue = val.replace(/[^0-9]/g, "");
+    setEnteredNumber(cleanValue);
+  };
 
   const resetInputHandler = () => setEnteredNumber("");
 
-  const confirmInputHandler = async () => {
-    const chosenNumber = parseInt(enteredNumber);
+  const confirmInputHandler = () => {
+    const chosenNumber = parseInt(enteredNumber.trim());
 
-    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
-      Alert.alert("Invalid Number!", "Number has to be a number between 1 and 99.", [
-        { text: "Okay", style: "destructive", onPress: resetInputHandler },
+    if (isNaN(chosenNumber) || chosenNumber < 1 || chosenNumber > 99) {
+      Alert.alert("⚠️ Invalid Number", "Please enter a number between 1 and 99.", [
+        { text: "OK", style: "destructive", onPress: resetInputHandler },
       ]);
       return;
     }
 
+    // Reset game boundaries for a fresh game
+    minBoundary = 1;
+    maxBoundary = 100;
+
+    Keyboard.dismiss();
     onPickNumber(chosenNumber);
   };
 
   return (
     <View style={styles.rootContainer}>
-      <Title>Guess My Number</Title>
-      <View style={styles.inputContainer}>
-        <Text style={styles.instructionText}>Enter a Number</Text>
+      <Title>🎯 Guess My Number</Title>
+
+      <Card>
+        <InstructionText style={styles.instructionText}>
+          Enter Your Secret Number
+        </InstructionText>
+
         <TextInput
           style={styles.numberInput}
           autoCapitalize="none"
@@ -40,14 +58,10 @@ const StartGameScreen = ({ onPickNumber }) => {
         />
 
         <View style={styles.btnsContainer}>
-          <View style={styles.btnContainer}>
-            <PrimaryButton onPress={resetInputHandler}>Reset</PrimaryButton>
-          </View>
-          <View style={styles.btnContainer}>
-            <PrimaryButton onPress={confirmInputHandler}>Confirm</PrimaryButton>
-          </View>
+          <PrimaryButton onPress={resetInputHandler}>🔄 Reset</PrimaryButton>
+          <PrimaryButton onPress={confirmInputHandler}>✅ Confirm</PrimaryButton>
         </View>
-      </View>
+      </Card>
     </View>
   );
 };
@@ -55,36 +69,33 @@ const StartGameScreen = ({ onPickNumber }) => {
 export default StartGameScreen;
 
 const styles = StyleSheet.create({
-  rootContainer: { flex: 1, marginTop: 100, alignItems: "center" },
-  inputContainer: {
-    padding: 16,
-    marginTop: 36,
-    marginHorizontal: 24,
-    gap: 4,
-    backgroundColor: Colors.primary800,
-    borderRadius: 8,
+  rootContainer: {
+    flex: 1,
+    marginTop: 100,
     alignItems: "center",
-    elevation: 4,
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
-    shadowOpacity: 0.25,
   },
-  instructionText: {
-    fontSize: 24,
+  subTitle: {
+    fontSize: 16,
     color: Colors.accent500,
+    marginTop: 4,
+    opacity: 0.8,
   },
+
   numberInput: {
-    // height: 50,
-    width: 50,
-    fontSize: 32,
+    width: 70,
+    fontSize: 36,
     fontWeight: "bold",
     color: Colors.accent500,
-    marginVertical: 8,
+    marginVertical: 10,
     borderBottomColor: Colors.accent500,
-    borderBottomWidth: 2,
+    borderBottomWidth: 3,
     textAlign: "center",
   },
-  btnsContainer: { flexDirection: "row" },
-  btnContainer: { flex: 1 },
+  btnsContainer: {
+    flexDirection: "row",
+    marginTop: 12,
+    justifyContent: "space-between",
+    width: "100%",
+    gap: 8,
+  },
 });
